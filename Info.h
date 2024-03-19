@@ -60,6 +60,15 @@ namespace winrt::ShowStart::implementation {
             }
         }
 
+        double mTicketNum;
+        double TicketNum() const { return mTicketNum; }
+        void TicketNum(double const& value) {
+            if (value != mTicketNum) {
+                mTicketNum = value;
+                mPropertyChanged(*this, Data::PropertyChangedEventArgs{ L"TicketNum" });
+            }
+        }
+
         hstring mTicketId;
         hstring TicketId() const { return mTicketId; }
         void TicketId(hstring const& value) {

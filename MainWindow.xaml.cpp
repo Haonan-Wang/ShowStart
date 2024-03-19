@@ -53,7 +53,7 @@ namespace winrt::ShowStart::implementation {
         // 结束程序清理window
         Closed([ ] (auto...) {
             window = nullptr;
-        });
+            });
 
         // 初始化信息
         {
@@ -61,7 +61,8 @@ namespace winrt::ShowStart::implementation {
             mGlobalInfo.Sign(L"");
             mGlobalInfo.StFlpv(util::uuid32());
             mGlobalInfo.Token(util::uuid32());
-            mGlobalInfo.ActivityId(L"220303");
+            mGlobalInfo.ActivityId(L"");
+            mGlobalInfo.TicketNum(2.0);
         }
     }
 
@@ -71,7 +72,7 @@ namespace winrt::ShowStart::implementation {
 
         mGlobalInfo.AccessToken(L"");
         mGlobalInfo.IdToken(L"");
-       
+
         co_await winrt::resume_background();
         JsonObject json{ work::api_get_token(mClient, util::map_to_json({
             { L"user_id", strjson(mGlobalInfo.UserId()) },
@@ -166,13 +167,6 @@ namespace winrt::ShowStart::implementation {
     // 买票
     IAsyncAction MainWindow::BuyClick(IInspectable const&, RoutedEventArgs const&) {
         winrt::apartment_context ui_thread;
-        // 输入购买张数
-        InputTicketNumBox().Value(1.0);
-        auto input_result{ co_await InputTicketNumDialog().ShowAsync() };
-        if (input_result != Controls::ContentDialogResult::Primary) {
-            co_return;
-        }
-
         // 确认订单
         auto ticket_num{ InputTicketNumBox().Value() };
         co_await winrt::resume_background();
@@ -185,7 +179,7 @@ namespace winrt::ShowStart::implementation {
             { L"st_flpv", strjson(mGlobalInfo.StFlpv()) },
             { L"activityId", strjson(mGlobalInfo.ActivityId()) },
             { L"ticketId", strjson(mGlobalInfo.TicketId()) },
-            { L"TicketNum", JsonValue::CreateNumberValue(ticket_num) }
+            { L"TicketNum", JsonValue::CreateNumberValue(mGlobalInfo.TicketNum()) }
             })) };
         co_await ui_thread;
 
@@ -194,8 +188,30 @@ namespace winrt::ShowStart::implementation {
             co_return co_await ShowTipDialog(json.GetNamedString(L"Information"));
         }
 
+        // 查询地址
+        co_await winrt::resume_background();
+        JsonObject address_json{ work::api_address_list(mClient, json) };
+        co_await ui_thread;
+
+        mGlobalInfo.Message(address_json.GetNamedString(L"Message"));
+        if (!address_json.GetNamedBoolean(L"OK")) {
+            co_return co_await ShowTipDialog(address_json.GetNamedString(L"Information"));
+        }
+
+        // 查询观演人
+        co_await winrt::resume_background();
+        JsonObject user_ids_json{ work::api_cp_list(mClient, json) };
+        co_await ui_thread;
+
+        mGlobalInfo.Message(user_ids_json.GetNamedString(L"Message"));
+        if (!user_ids_json.GetNamedBoolean(L"OK")) {
+            co_return co_await ShowTipDialog(user_ids_json.GetNamedString(L"Information"));
+        }
+
         // 下单
         co_await winrt::resume_background();
+        json.Insert(L"addressId", address_json.Lookup(L"addressId"));
+        json.Insert(L"userIds", user_ids_json.Lookup(L"userIds"));
         JsonObject order_json{ work::api_order(mClient, json) };
         co_await ui_thread;
 

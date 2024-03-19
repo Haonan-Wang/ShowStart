@@ -13,10 +13,10 @@ namespace work {
 	void MakeHeader(Headers::HttpRequestHeaderCollection const& headers, hstring const& crtrace_id,
 		hstring const& url, hstring const& data, hstring const& UserId, hstring const& Sign,
 		hstring const& AccessToken, hstring const& IdToken, hstring const& Token, hstring const& StFlpv) {
-		
+
 		hstring v{ crtrace_id.empty() ? util::uuid32() + util::timestamp13() : crtrace_id };
 		hstring crp_sign{ AccessToken + Sign + IdToken + UserId + L"wap" + Token + data + url + L"997" + L"wap" + v };
-		
+
 		headers.UserAgent().TryParseAdd(L"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.0.0");
 		headers.Insert(L"CUSAT", AccessToken);
 		headers.Insert(L"CUSUT", Sign);
@@ -321,6 +321,81 @@ namespace work {
 		return ret;
 	}
 
+	JsonObject api_address_list(HttpClient client, JsonObject args) {
+		JsonObject ret;
+		Uri url{ L"https://wap.showstart.com/v3/wap/address/list" };
+		hstring data{ util::map_to_json({
+			{ L"st_flpv", args.Lookup(L"st_flpv") },
+			{ L"sign", args.Lookup(L"sign") },
+			{ L"trackPath", L""_json }
+			}).Stringify() };
+		HttpStringContent content{ data, UnicodeEncoding::Utf8, L"application/json" };
+		MakeHeader(client.DefaultRequestHeaders(), L"", L"/wap/address/list", data,
+			args.GetNamedString(L"user_id"), args.GetNamedString(L"sign"),
+			args.GetNamedString(L"access_token"), args.GetNamedString(L"id_token"),
+			args.GetNamedString(L"token"), args.GetNamedString(L"st_flpv"));
+		HttpResponseMessage res{ client.PostAsync(url, content).get() };
+		res.EnsureSuccessStatusCode();
+		hstring body{ res.Content().ReadAsStringAsync().get() };
+		ret.Insert(L"Message", strjson(body));
+		auto json{ JsonObject::Parse(body) };
+		auto ok{ json.GetNamedString(L"state") == L"1" };
+		ret.Insert(L"OK", JsonValue::CreateBooleanValue(ok));
+		if (ok) {
+			auto addresses{ json.GetNamedArray(L"result") };
+			if (addresses.Size() == 0) {
+				ret.Insert(L"Information", strjson(L"请先新增收货地址"));
+			}
+			else {
+				ret.Insert(L"addressId", addresses.GetAt(0).GetObject().Lookup(L"id"));
+			}
+		}
+		else {
+			ret.Insert(L"Information", strjson(json.GetNamedString(L"msg", L"请求服务器失败")));
+		}
+		return ret;
+	}
+
+	JsonObject api_cp_list(HttpClient client, JsonObject args) {
+		JsonObject ret;
+		Uri url{ L"https://wap.showstart.com/v3/wap/cp/list" };
+		hstring data{ util::map_to_json({
+			{ L"st_flpv", args.Lookup(L"st_flpv") },
+			{ L"sign", args.Lookup(L"sign") },
+			{ L"trackPath", L""_json }
+			}).Stringify() };
+		HttpStringContent content{ data, UnicodeEncoding::Utf8, L"application/json" };
+		MakeHeader(client.DefaultRequestHeaders(), L"", L"/wap/cp/list", data,
+			args.GetNamedString(L"user_id"), args.GetNamedString(L"sign"),
+			args.GetNamedString(L"access_token"), args.GetNamedString(L"id_token"),
+			args.GetNamedString(L"token"), args.GetNamedString(L"st_flpv"));
+		HttpResponseMessage res{ client.PostAsync(url, content).get() };
+		res.EnsureSuccessStatusCode();
+		hstring body{ res.Content().ReadAsStringAsync().get() };
+		ret.Insert(L"Message", strjson(body));
+		auto json{ JsonObject::Parse(body) };
+		auto ok{ json.GetNamedString(L"state") == L"1" };
+		ret.Insert(L"OK", JsonValue::CreateBooleanValue(ok));
+		if (ok) {
+			auto users{ json.GetNamedArray(L"result") };
+			auto ticket_num{ std::stoul(args.GetNamedString(L"num").c_str()) };
+			if (users.Size() < ticket_num) {
+				ret.Insert(L"Information", strjson(L"请先新增观演人"));
+			}
+			else {
+				JsonArray ret_user_ids;
+				for (unsigned int i{ }; i < ticket_num; ++i) {
+					ret_user_ids.Append(users.GetAt(i).GetObject().Lookup(L"id"));
+				}
+				ret.Insert(L"userIds", ret_user_ids);
+			}
+		}
+		else {
+			ret.Insert(L"Information", strjson(json.GetNamedString(L"msg", L"请求服务器失败")));
+		}
+		return ret;
+	}
+
 	// [request]
 	// user_id
 	// sign
@@ -364,10 +439,10 @@ namespace work {
 			}));
 		auto json_data{ util::map_to_json({
 			{ L"orderDetails", order_details },
-			{ L"commonPerfomerIds", JsonArray{ } },
+			{ L"commonPerfomerIds", args.Lookup(L"userIds") },
 			{ L"areaCode", args.Lookup(L"areaCode") },
 			{ L"telephone", args.Lookup(L"telephone") },
-			{ L"addressId", L""_json },
+			{ L"addressId", args.Lookup(L"addressId") },
 			{ L"teamId", L""_json },
 			{ L"couponId", L""_json },
 			{ L"checkCode", L""_json },

@@ -35,31 +35,37 @@
                        VerticalAlignment="Center" Text="ActivityId" />
             <TextBox Grid.Row="2" Grid.Column="1" Margin="10,5,10,5" Text="{x:Bind GlobalInfo.ActivityId, Mode=TwoWay}" />
             <TextBlock Grid.Row="3" Grid.Column="0" Margin="10,5,10,5"
-                       VerticalAlignment="Center" Text="TicketId" />
-            <TextBox Grid.Row="3" Grid.Column="1" Margin="10,5,10,5"
-                     IsReadOnly="True"
-                     Text="{x:Bind GlobalInfo.TicketId, Mode=TwoWay}" />
+                       VerticalAlignment="Center" Text="TicketNum" />
+            <NumberBox Grid.Row="3" Grid.Column="1" Margin="10,5,10,5"
+                       Maximum="99" Minimum="1"
+                       SpinButtonPlacementMode="Inline"
+                       Value="{x:Bind GlobalInfo.TicketNum, Mode=TwoWay}" />
             <TextBlock Grid.Row="4" Grid.Column="0" Margin="10,5,10,5"
-                       VerticalAlignment="Center" Text="StFlpv" />
+                       VerticalAlignment="Center" Text="TicketId" />
             <TextBox Grid.Row="4" Grid.Column="1" Margin="10,5,10,5"
                      IsReadOnly="True"
-                     Text="{x:Bind GlobalInfo.StFlpv, Mode=TwoWay}" />
+                     Text="{x:Bind GlobalInfo.TicketId, Mode=TwoWay}" />
             <TextBlock Grid.Row="5" Grid.Column="0" Margin="10,5,10,5"
-                       VerticalAlignment="Center" Text="Token" />
+                       VerticalAlignment="Center" Text="StFlpv" />
             <TextBox Grid.Row="5" Grid.Column="1" Margin="10,5,10,5"
                      IsReadOnly="True"
-                     Text="{x:Bind GlobalInfo.Token, Mode=TwoWay}" />
+                     Text="{x:Bind GlobalInfo.StFlpv, Mode=TwoWay}" />
             <TextBlock Grid.Row="6" Grid.Column="0" Margin="10,5,10,5"
-                       VerticalAlignment="Center" Text="AccessToken" />
+                       VerticalAlignment="Center" Text="Token" />
             <TextBox Grid.Row="6" Grid.Column="1" Margin="10,5,10,5"
                      IsReadOnly="True"
-                     Text="{x:Bind GlobalInfo.AccessToken, Mode=TwoWay}" />
+                     Text="{x:Bind GlobalInfo.Token, Mode=TwoWay}" />
             <TextBlock Grid.Row="7" Grid.Column="0" Margin="10,5,10,5"
-                       VerticalAlignment="Center" Text="IdToken" />
+                       VerticalAlignment="Center" Text="AccessToken" />
             <TextBox Grid.Row="7" Grid.Column="1" Margin="10,5,10,5"
                      IsReadOnly="True"
+                     Text="{x:Bind GlobalInfo.AccessToken, Mode=TwoWay}" />
+            <TextBlock Grid.Row="8" Grid.Column="0" Margin="10,5,10,5"
+                       VerticalAlignment="Center" Text="IdToken" />
+            <TextBox Grid.Row="8" Grid.Column="1" Margin="10,5,10,5"
+                     IsReadOnly="True"
                      Text="{x:Bind GlobalInfo.IdToken, Mode=TwoWay}" />
-            <TextBox Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2"
+            <TextBox Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2"
                      Margin="10" Header="请求日志:" IsReadOnly="True"
                      Text="{x:Bind GlobalInfo.Message, Mode=TwoWay}"
                      TextWrapping="Wrap" />

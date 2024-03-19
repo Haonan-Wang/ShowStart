@@ -37,27 +37,35 @@ namespace util {
 
 namespace work {
 	winrt::Windows::Data::Json::JsonObject api_get_token(
-			winrt::Windows::Web::Http::HttpClient client,
-			winrt::Windows::Data::Json::JsonObject args
-		);
+		winrt::Windows::Web::Http::HttpClient client,
+		winrt::Windows::Data::Json::JsonObject args
+	);
 	winrt::Windows::Data::Json::JsonObject api_activity_details(
 		winrt::Windows::Web::Http::HttpClient client,
 		winrt::Windows::Data::Json::JsonObject args
 	);
 	winrt::Windows::Data::Json::JsonObject api_ticket_list(
-			winrt::Windows::Web::Http::HttpClient client,
-			winrt::Windows::Data::Json::JsonObject args
-		);
+		winrt::Windows::Web::Http::HttpClient client,
+		winrt::Windows::Data::Json::JsonObject args
+	);
 	winrt::Windows::Data::Json::JsonObject api_order_confirm(
-			winrt::Windows::Web::Http::HttpClient client,
-			winrt::Windows::Data::Json::JsonObject args
-		);
+		winrt::Windows::Web::Http::HttpClient client,
+		winrt::Windows::Data::Json::JsonObject args
+	);
+	winrt::Windows::Data::Json::JsonObject api_address_list(
+		winrt::Windows::Web::Http::HttpClient client,
+		winrt::Windows::Data::Json::JsonObject args
+	);
+	winrt::Windows::Data::Json::JsonObject api_cp_list(
+		winrt::Windows::Web::Http::HttpClient client,
+		winrt::Windows::Data::Json::JsonObject args
+	);
 	winrt::Windows::Data::Json::JsonObject api_order(
-			winrt::Windows::Web::Http::HttpClient client,
-			winrt::Windows::Data::Json::JsonObject args
-		);
+		winrt::Windows::Web::Http::HttpClient client,
+		winrt::Windows::Data::Json::JsonObject args
+	);
 	winrt::Windows::Data::Json::JsonObject api_get_order_result(
-			winrt::Windows::Web::Http::HttpClient client,
-			winrt::Windows::Data::Json::JsonObject args
-		);
+		winrt::Windows::Web::Http::HttpClient client,
+		winrt::Windows::Data::Json::JsonObject args
+	);
 }

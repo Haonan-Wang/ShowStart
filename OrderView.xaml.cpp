@@ -19,12 +19,12 @@ namespace winrt::ShowStart::implementation {
             if (auto size{ mLogData.Size() }) {
                 LogList().ScrollIntoView(box_value(mLogData.GetAt(size - 1U)));
             }
-        });
+            });
     }
 
     void OrderView::AddClick(IInspectable const&, RoutedEventArgs const&) {
         const ShowStart::Info info{ window.GlobalInfo() };
-        mOrders.Append(ShowStart::Order{ info.UserId(), info.Sign(), info.ActivityId(), info.TicketId(), 1.0, 4.0 });
+        mOrders.Append(ShowStart::Order{ info.UserId(), info.Sign(), info.ActivityId(), info.TicketId(), info.TicketNum(), 1.0 });
     }
 
     void OrderView::DeleteClick(IInspectable const&, RoutedEventArgs const&) {
@@ -63,7 +63,7 @@ namespace winrt::ShowStart::implementation {
 
     IAsyncAction OrderView::StartClick(IInspectable const&, RoutedEventArgs const&) {
         winrt::apartment_context ui_thread;
-        
+
         StopButton().IsEnabled(true);
 
         int total_thread_num{ }, thread_index{ };
@@ -71,7 +71,7 @@ namespace winrt::ShowStart::implementation {
             total_thread_num += (int)order.ThreadNum();
         }
         mTasks = std::vector<int>(total_thread_num, 0);
-        
+
         for (auto const order : mOrders) {
             HttpClient mainClient;
             int thread_num{ (int)order.ThreadNum() };
@@ -115,6 +115,28 @@ namespace winrt::ShowStart::implementation {
                 if (!ok) continue;
             }
 
+            co_await winrt::resume_background();
+            JsonObject address_json{ work::api_address_list(mainClient, confirm_json) };
+            co_await ui_thread;
+
+            {
+                bool ok{ address_json.GetNamedBoolean(L"OK") };
+                mLogData.Append(winrt::format(L"[用户{}] address_list {}\n", order.UserId(), ok ? L"成功!" : address_json.GetNamedString(L"Information")));
+                if (!ok) continue;
+            }
+
+            co_await winrt::resume_background();
+            JsonObject user_ids_json{ work::api_cp_list(mainClient, confirm_json) };
+            co_await ui_thread;
+
+            {
+                bool ok{ user_ids_json.GetNamedBoolean(L"OK") };
+                mLogData.Append(winrt::format(L"[用户{}] cp_list {}\n", order.UserId(), ok ? L"成功!" : user_ids_json.GetNamedString(L"Information")));
+                if (!ok) continue;
+            }
+
+            confirm_json.Insert(L"addressId", address_json.Lookup(L"addressId"));
+            confirm_json.Insert(L"userIds", user_ids_json.Lookup(L"userIds"));
             for (int i{ }; i < thread_num; ++i) {
                 OrderTask(ui_thread, i, &mTasks[thread_index++], order.UserId(), confirm_json);
             }

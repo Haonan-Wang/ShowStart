@@ -8,6 +8,7 @@ namespace ShowStart {
         String StFlpv;
         String Token; // µÇÂ¼ÁîÅÆ
         String ActivityId; // ÑÝ³öID
+        Double TicketNum; // ¹ºÆ±ÊýÁ¿
         String TicketId; // Æ±ID
         String AccessToken;
         String IdToken;
