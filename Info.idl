@@ -13,5 +13,6 @@ namespace ShowStart {
         String AccessToken;
         String IdToken;
         String Message; // 请求信息
+        Double StartTime; // 开抢时间
     }
 }

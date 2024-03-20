@@ -158,6 +158,7 @@ namespace work {
 				}
 			}
 			ret.Insert(L"Singers", ret_singers);
+			ret.Insert(L"startTime", result.GetNamedObject(L"strategyInfo").GetNamedObject(L"ticketStrategy").Lookup(L"startTime"));
 		}
 		else {
 			ret.Insert(L"Information", strjson(json.GetNamedString(L"msg", L"请求服务器失败")));

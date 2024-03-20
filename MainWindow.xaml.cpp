@@ -129,6 +129,7 @@ namespace winrt::ShowStart::implementation {
                 });
         }
         showInfo.Singers(singersVector);
+        mGlobalInfo.StartTime(static_cast<double>(json.GetNamedNumber(L"startTime")));
 
         // 查票列表
         co_await winrt::resume_background();

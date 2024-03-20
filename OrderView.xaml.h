@@ -19,7 +19,7 @@ namespace winrt::ShowStart::implementation {
         void AddClick(IInspectable const&, RoutedEventArgs const&);
         void DeleteClick(IInspectable const&, RoutedEventArgs const&);
         void ClearClick(IInspectable const&, RoutedEventArgs const&);
-        Windows::Foundation::IAsyncAction OrderTask(apartment_context ui_thread, int task_id, int* task_sign, hstring user_id, Windows::Data::Json::JsonObject confirm_json);
+        Windows::Foundation::IAsyncAction OrderTask(apartment_context ui_thread, int task_id, int* task_sign, hstring user_id, Windows::Data::Json::JsonObject confirm_json, double interval_millis);
         Windows::Foundation::IAsyncAction StartClick(IInspectable const&, RoutedEventArgs const&);
         void StopClick(IInspectable const&, RoutedEventArgs const&);
     };

@@ -104,6 +104,15 @@ namespace winrt::ShowStart::implementation {
                 mPropertyChanged(*this, Data::PropertyChangedEventArgs{ L"Message" });
             }
         }
+
+        double mStartTime;
+        double  StartTime() const { return mStartTime; }
+        void StartTime(double const& value) {
+            if (value != mStartTime) {
+                mStartTime = value;
+                mPropertyChanged(*this, Data::PropertyChangedEventArgs{ L"StartTime" });
+            }
+        }
     };
 }
 

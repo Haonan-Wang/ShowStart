@@ -4,7 +4,9 @@
 #include "OrderView.g.cpp"
 #endif
 #include "ShowStart.h"
+#include "winrt/Windows.System.Threading.h"
 
+using namespace std::chrono;
 using namespace winrt::Windows::Foundation;
 using namespace winrt::Windows::Data::Json;
 using namespace winrt::Windows::Web::Http;
@@ -24,7 +26,7 @@ namespace winrt::ShowStart::implementation {
 
     void OrderView::AddClick(IInspectable const&, RoutedEventArgs const&) {
         const ShowStart::Info info{ window.GlobalInfo() };
-        mOrders.Append(ShowStart::Order{ info.UserId(), info.Sign(), info.ActivityId(), info.TicketId(), info.TicketNum(), 1.0 });
+        mOrders.Append(ShowStart::Order{ info.UserId(), info.Sign(), info.ActivityId(), info.TicketId(), info.TicketNum(), 1.0, 3000.0 });
     }
 
     void OrderView::DeleteClick(IInspectable const&, RoutedEventArgs const&) {
@@ -40,7 +42,19 @@ namespace winrt::ShowStart::implementation {
         mLogData.Clear();
     }
 
-    IAsyncAction OrderView::OrderTask(apartment_context ui_thread, int task_id, int* task_sign, hstring user_id, Windows::Data::Json::JsonObject confirm_json) {
+    IAsyncAction OrderView::OrderTask(apartment_context ui_thread, int task_id, int* task_sign, hstring user_id, Windows::Data::Json::JsonObject confirm_json, double interval_millis) {
+        auto startTime{ window.GlobalInfo().StartTime() };
+        auto now{ duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() };
+        auto sleepDuration{ startTime - now };
+        if (sleepDuration > 0) {
+            co_await ui_thread;
+            mLogData.Append(winrt::format(L"[用户{} 线程{}] startTime: {}ms, now: {}ms, sleepDuration: {}ms\n", user_id, task_id, startTime, now, sleepDuration));
+            co_await Windows::System::Threading::ThreadPool::RunAsync([&](Windows::Foundation::IAsyncAction const& workItem)
+            {
+                Sleep(sleepDuration);
+            });
+        }
+
         while (*task_sign == 0) {
             co_await winrt::resume_background();
 
@@ -50,7 +64,15 @@ namespace winrt::ShowStart::implementation {
 
             co_await ui_thread;
             mLogData.Append(winrt::format(L"[用户{} 线程{}] order {}\n", user_id, task_id, ok ? L"抢票成功!" : order_json.GetNamedString(L"Information")));
-            if (ok) *task_sign = 2;
+            if (ok) {
+                *task_sign = 2;
+            }
+            else if (interval_millis > 0) {
+                co_await Windows::System::Threading::ThreadPool::RunAsync([&](Windows::Foundation::IAsyncAction const& workItem)
+                {
+                    Sleep(interval_millis);
+                });
+            }
         }
 
         co_await ui_thread;
@@ -138,7 +160,7 @@ namespace winrt::ShowStart::implementation {
             confirm_json.Insert(L"addressId", address_json.Lookup(L"addressId"));
             confirm_json.Insert(L"userIds", user_ids_json.Lookup(L"userIds"));
             for (int i{ }; i < thread_num; ++i) {
-                OrderTask(ui_thread, i, &mTasks[thread_index++], order.UserId(), confirm_json);
+                OrderTask(ui_thread, i, &mTasks[thread_index++], order.UserId(), confirm_json, order.IntervalMillis());
             }
         }
     }

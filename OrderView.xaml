@@ -18,7 +18,7 @@
                           Background="AliceBlue" BorderBrush="LightGreen"
                           BorderThickness="0,1,0,1"
                           ColumnDefinitions="*, 2*" CornerRadius="5"
-                          RowDefinitions="*, *, *">
+                          RowDefinitions="*, *, *, *">
                         <TextBox Grid.Row="0" Grid.Column="0" Margin="5,0,5,0"
                                  HorizontalAlignment="Stretch"
                                  VerticalAlignment="Center" Header="UserId:"
@@ -51,6 +51,12 @@
                                    Maximum="16" Minimum="1"
                                    SpinButtonPlacementMode="Inline"
                                    Value="{x:Bind ThreadNum, Mode=TwoWay}" />
+                        <NumberBox Grid.Row="3" Grid.Column="0" Margin="5,0,5,0"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Center" Header="IntervalMillis:"
+                                   Maximum="5000" Minimum="0"
+                                   SpinButtonPlacementMode="Inline"
+                                   Value="{x:Bind IntervalMillis, Mode=TwoWay}" />
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>

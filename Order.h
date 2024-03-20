@@ -6,9 +6,9 @@ using namespace winrt::Microsoft::UI::Xaml;
 namespace winrt::ShowStart::implementation {
     struct Order : OrderT<Order> {
         Order(hstring const& user_id, hstring const& sign, hstring const& activity_id,
-            hstring const& ticket_id, double ticket_num, double thread_num) :
+            hstring const& ticket_id, double ticket_num, double thread_num, double interval_millis) :
             mUserId{ user_id }, mSign{ sign }, mActivityId{ activity_id }, mTicketId{ ticket_id },
-            mTicketNum{ ticket_num }, mThreadNum{ thread_num } { }
+            mTicketNum{ ticket_num }, mThreadNum{ thread_num }, mIntervalMillis{ interval_millis } { }
 
         event<Data::PropertyChangedEventHandler> mPropertyChanged;
         event_token PropertyChanged(Data::PropertyChangedEventHandler const& value) {
@@ -69,6 +69,15 @@ namespace winrt::ShowStart::implementation {
             if (value != mThreadNum) {
                 mThreadNum = value;
                 mPropertyChanged(*this, Data::PropertyChangedEventArgs{ L"ThreadNum" });
+            }
+        }
+
+        double mIntervalMillis;
+        double IntervalMillis() const { return mIntervalMillis; }
+        void IntervalMillis(double value) {
+            if (value != mIntervalMillis) {
+                mIntervalMillis = value;
+                mPropertyChanged(*this, Data::PropertyChangedEventArgs{ L"IntervalMillis" });
             }
         }
     };
