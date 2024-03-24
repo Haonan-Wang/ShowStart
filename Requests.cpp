@@ -158,12 +158,27 @@ namespace work {
 				}
 			}
 			ret.Insert(L"Singers", ret_singers);
-			ret.Insert(L"startTime", result.GetNamedObject(L"strategyInfo").GetNamedObject(L"ticketStrategy").Lookup(L"startTime"));
+			ret.Insert(L"startTime", JsonValue::CreateNumberValue(work::get_start_time(result)));
 		}
 		else {
 			ret.Insert(L"Information", strjson(json.GetNamedString(L"msg", L"请求服务器失败")));
 		}
 		return ret;
+	}
+
+	double get_start_time(JsonObject result) {
+		if (!result.HasKey(L"strategyInfo")) {
+			return 0;
+		}
+		auto strategyInfo{ result.GetNamedObject(L"strategyInfo") };
+		if (!strategyInfo.HasKey(L"ticketStrategy")) {
+			return 0;
+		}
+		auto ticketStrategy{ strategyInfo.GetNamedObject(L"ticketStrategy") };
+		if (!ticketStrategy.HasKey(L"startTime")) {
+			return 0;
+		}
+		return ticketStrategy.GetNamedNumber(L"startTime");
 	}
 
 	// [request]

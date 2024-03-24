@@ -44,6 +44,9 @@ namespace work {
 		winrt::Windows::Web::Http::HttpClient client,
 		winrt::Windows::Data::Json::JsonObject args
 	);
+	double get_start_time(
+		winrt::Windows::Data::Json::JsonObject result
+	);
 	winrt::Windows::Data::Json::JsonObject api_ticket_list(
 		winrt::Windows::Web::Http::HttpClient client,
 		winrt::Windows::Data::Json::JsonObject args
